@@ -140,7 +140,6 @@ class DataAnalysis:
         result['population'] = result['population'].map(lambda x: float(x))
         result['rate'] = result['totalCases'] / result['population']
         result = result.sort_values(by='rate', ascending=False)
-
         countries, rates = [], []
         for row in result.iterrows():
             if row[1][0] not in self.unitedNouns:
@@ -248,15 +247,14 @@ class DataAnalysis:
     def deathRateTop10(self):
         deathdf, casesdf = self.totalDeaths.dropna(), self.totalCases.dropna()
         casesDf = casesdf[casesdf['date'] == '2021/12/29']
-        deathdf = deathdf[casesdf['date'] == '2021/12/29']
+        deathdf = deathdf[deathdf['date'] == '2021/12/29']
         result = pd.merge(casesDf, deathdf, on='country')
+        print(result)
         result['totalCases'] = result['totalCases'].map(lambda x: float(x))
         result['rate'] = result['totalDeaths'] / result['totalCases']
         result = result.sort_values(by='rate', ascending=False)
-
         countries, rates = [], []
         for row in result.iterrows():
-            print(row)
             if row[1][0] not in self.unitedNouns:
                 countries.append(row[1][0])
                 rates.append(float('%.2f' % (100 * float(row[1][5]))))
@@ -274,7 +272,6 @@ class DataAnalysis:
         plt.xticks(rotation=45, fontsize=9)
         # 设置边框部分留白
         plt.gcf().subplots_adjust(bottom=0.15)
-        # plt.tight_layout()
         # 填充数据，设置颜色
         plt.bar(countries, rates, color='gold')  # bar的颜色改为红色
         for a, b in zip(countries, rates):  # 在直方图上显示本学期的排名数字
@@ -293,8 +290,6 @@ class DataAnalysis:
         result['casesRate'] = result['totalCases'] / result['population']
         result['vcRate'] = result['vaccine'] / result['population']
         result = result.sort_values(by='casesRate', ascending=True)
-        print(result)
-
         countries, rates = [], []
         for row in result.iterrows():
             if row[1][7] < 0.80 or float(row[1][3]) < 10000000:
@@ -316,7 +311,6 @@ class DataAnalysis:
         plt.xticks(rotation=45, fontsize=9)
         # 设置边框部分留白
         plt.gcf().subplots_adjust(bottom=0.15)
-        # plt.tight_layout()
         # 填充数据，设置颜色
         plt.bar(countries, rates, color='paleturquoise')  # bar的颜色改为红色
         for a, b in zip(countries, rates):  # 在直方图上显示本学期的排名数字
@@ -334,9 +328,7 @@ class DataAnalysis:
         model.fit([[i] for i in range(0, 10)], [[i] for i in casesTrain])
         predictData = [int(i[0]) for i in model.predict([[i] for i in range(10, 15)])]
         trueData = casesList[-6:-1]
-
         plt.subplots(figsize=(12, 10))
-
         plt.plot(dateList[10:],predictData,label="预测数据")
         plt.plot(dateList[10:],trueData,label="真实数据")
         # 旋转横坐标，防止重叠
@@ -351,14 +343,14 @@ class DataAnalysis:
 if __name__ == "__main__":
     matplotlib.rcParams['font.sans-serif'] = ['SimHei']
     da = DataAnalysis()
-    da.worldTrend()
-    da.newCasesTop10()
-    da.totalCasesTop10()
-    da.rateOfEachCountry()
-    da.rateTop10()
-    da.vaccineNum()
-    da.vaccineRate()
-    da.GDPTop10TotalCases()
+    # da.worldTrend()
+    # da.newCasesTop10()
+    # da.totalCasesTop10()
+    # da.rateOfEachCountry()
+    # da.rateTop10()
+    # da.vaccineNum()
+    # da.vaccineRate()
+    # da.GDPTop10TotalCases()
     da.deathRateTop10()
-    da.bestTop10()
-    da.predict()
+    # da.bestTop10()
+    # da.predict()
