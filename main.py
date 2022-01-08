@@ -1,8 +1,7 @@
-import math
-
 import pandas as pd
 import matplotlib
 import matplotlib.pyplot as plt
+from sklearn import linear_model
 from pyecharts import options as opts
 from pyecharts.charts import Map
 
@@ -109,10 +108,8 @@ class DataAnalysis:
         df = df[df['country'] == 'World']  # 筛选出世界所有确诊病例
         df = df[df['date'] == '2021/12/29']
         worldPopulation = df['totalCases'][0]
-
         df = self.totalCases
         newDf = df[df['date'] == '2021/12/29'].sort_values(by='totalCases', ascending=False)
-
         # 获取百分比占10排名前的国家
         countries, rates = [], []
         curSum = 0
@@ -129,6 +126,7 @@ class DataAnalysis:
         rates.append(newRate)
         explode = [0.3, 0.2, 0.1] + [0] * (len(rates) - 3)
         plt.subplots(figsize=(10, 8))
+        plt.title('各国确诊病例占全球确诊病例比例图')
         plt.pie(rates, labels=countries, explode=explode, labeldistance=1.2, autopct='%1.1f%%', shadow=False,
                 startangle=90,
                 pctdistance=0.6)
@@ -326,17 +324,41 @@ class DataAnalysis:
         # 展示图片
         plt.show()
 
+    def predict(self):
+        df = self.totalCases
+        df = df[df["country"] == "World"]  # 筛选出世界所有确诊病例
+        # 依次取出确诊病例、对应日期
+        casesList, dateList = [df.loc[i][1] for i in range(14, -1, -1)], [df.loc[i][2] for i in range(14, -1, -1)]
+        casesTrain = casesList[:10:]
+        model = linear_model.LinearRegression()
+        model.fit([[i] for i in range(0, 10)], [[i] for i in casesTrain])
+        predictData = [int(i[0]) for i in model.predict([[i] for i in range(10, 15)])]
+        trueData = casesList[-6:-1]
+
+        plt.subplots(figsize=(12, 10))
+
+        plt.plot(dateList[10:],predictData,label="预测数据")
+        plt.plot(dateList[10:],trueData,label="真实数据")
+        # 旋转横坐标，防止重叠
+        plt.title('预测确诊人数变化')
+        plt.xlabel('时间', fontsize=9)
+        plt.ylabel('确诊人数', fontsize=9)
+        plt.legend()  # 显示图例
+        plt.show()
+
+
 
 if __name__ == "__main__":
     matplotlib.rcParams['font.sans-serif'] = ['SimHei']
     da = DataAnalysis()
-    # da.worldTrend()
-    # da.newCasesTop10()
-    # da.totalCasesTop10()
-    # da.rateOfEachCountry()
-    # da.rateTop10()
-    # da.vaccineNum()
-    # da.vaccineRate()
-    # da.GDPTop10TotalCases()
-    # da.deathRateTop10()
+    da.worldTrend()
+    da.newCasesTop10()
+    da.totalCasesTop10()
+    da.rateOfEachCountry()
+    da.rateTop10()
+    da.vaccineNum()
+    da.vaccineRate()
+    da.GDPTop10TotalCases()
+    da.deathRateTop10()
     da.bestTop10()
+    da.predict()
